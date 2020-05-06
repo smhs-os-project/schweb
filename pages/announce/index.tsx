@@ -71,11 +71,15 @@ export function AnnoSummaryCard(props: ISummaryCardProps) {
 }
 
 function substrFind(str1: string, str2: string) {
-  if (str1.includes(str2)) return true;
-  return false;
+  let isFound = false;
+
+  str2.split(' ').forEach((t) => {
+    if (str1.includes(t)) isFound = true;
+  });
+
+  return isFound;
 }
 
-// eslint-disable-next-line react/prefer-stateless-function
 export default class Announcement extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
