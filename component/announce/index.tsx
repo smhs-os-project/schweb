@@ -6,12 +6,10 @@
  * @author youualan87, pan93412
  */
 
-import { GetStaticProps } from 'next';
 import Parser from 'rss-parser';
 import React, { FormEvent } from 'react';
-import Head from 'next/head';
 import {
-  Section, Container, Title, CardContent, Column, Subtitle,
+  Container, Title, CardContent, Column, Subtitle,
   LevelRight, LevelItem, Field, Control, Input,
 } from 'bloomer';
 import { Card } from 'bloomer/lib/components/Card/Card';
@@ -21,8 +19,6 @@ import { Level } from 'bloomer/lib/components/Level/Level';
 import { LevelLeft } from 'bloomer/lib/components/Level/LevelLeft';
 import { CardFooter } from 'bloomer/lib/components/Card/Footer/CardFooter';
 import { CardFooterItem } from 'bloomer/lib/components/Card/Footer/CardFooterItem';
-
-const rssGuid = 'b733b7d5-2704-70be-b2c2-94180a804674';
 
 interface IProps {
   rss: Parser.Output;
@@ -36,21 +32,27 @@ interface ISummaryCardProps {
   title?: string;
   body?: string;
   pubDate?: string;
+  url?: string;
 }
 
 export function AnnoSummaryCard(props: ISummaryCardProps) {
-  const { title, pubDate, body } = props;
+  const {
+    title, pubDate, body, url,
+  } = props;
 
   return (
     <Card>
       <CardContent>
-        <Title isSize={3}>{title || '未命名公告'}</Title>
-        <div style={{ fontSize: '0.6em', color: 'lightgray' }}>
-          {pubDate || ''}
-        </div>
+        <Title isSize={3}>
+          {title || '未命名公告'}
+          <br />
+          <small style={{ fontSize: '0.4em', color: 'lightgray' }}>
+            {pubDate || ''}
+          </small>
+        </Title>
         <Content
           style={{
-            maxHeight: '6em',
+            maxHeight: '10em',
             overflow: 'auto',
           }}
         >
@@ -62,8 +64,8 @@ export function AnnoSummaryCard(props: ISummaryCardProps) {
         </Content>
       </CardContent>
       <CardFooter>
-        <CardFooterItem>
-          設定
+        <CardFooterItem href={url || ''}>
+          瀏覽完整公告
         </CardFooterItem>
       </CardFooter>
     </Card>
@@ -111,66 +113,43 @@ export default class Announcement extends React.Component<IProps, IState> {
 
   render() {
     const { rssItems } = this.state;
-
     return (
-      <div>
-        <Head>
-          <title>schweb // 校內公告</title>
-        </Head>
-
-        <Section>
-          <Container style={{ marginBottom: '1em' }}>
-            <Title>校內公告</Title>
-          </Container>
-          <Container>
-            <Level>
-              <LevelLeft>
-                <Subtitle tag="p" isSize={5}>
-                  <strong>{rssItems.length}</strong>
-                  {' '}
-                  則公告
-                </Subtitle>
-              </LevelLeft>
-              <LevelRight>
-                <LevelItem>
-                  <Field hasAddons>
-                    <Control>
-                      <Input onChange={this.search} placeholder="搜尋公告..." />
-                    </Control>
-                  </Field>
-                </LevelItem>
-              </LevelRight>
-            </Level>
-            <Columns isMultiline>
-              {
-                rssItems
-                  ? rssItems.map((item) => (
-                    <Column isSize="1/2">
-                      <AnnoSummaryCard
-                        title={item.title}
-                        body={item.content}
-                        pubDate={item.pubDate}
-                      />
-                    </Column>
-                  ))
-                  : <Column isSize="1/2"><p>Weird. 無法取得任何資料，請將此問題回報給我們。</p></Column>
-              }
-            </Columns>
-          </Container>
-        </Section>
-      </div>
+      <Container>
+        <Level>
+          <LevelLeft>
+            <Subtitle tag="p" isSize={5}>
+              <strong>{rssItems.length}</strong>
+              {' '}
+              則公告
+            </Subtitle>
+          </LevelLeft>
+          <LevelRight>
+            <LevelItem>
+              <Field hasAddons>
+                <Control>
+                  <Input onChange={this.search} placeholder="搜尋公告..." />
+                </Control>
+              </Field>
+            </LevelItem>
+          </LevelRight>
+        </Level>
+        <Columns isMultiline>
+          {
+            rssItems
+              ? rssItems.map((item) => (
+                <Column isSize="1/2">
+                  <AnnoSummaryCard
+                    title={item.title}
+                    body={item.content}
+                    pubDate={item.pubDate}
+                    url={item.link}
+                  />
+                </Column>
+              ))
+              : <Column isSize="1/2"><p>Weird. 無法取得任何資料，請將此問題回報給我們。</p></Column>
+          }
+        </Columns>
+      </Container>
     );
   }
 }
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const getStaticProps: GetStaticProps = async (_ctx) => {
-  const parser = new Parser();
-  const rss = await parser.parseURL(`http://www.smhs.kh.edu.tw/RssXml.php?Guid=${rssGuid}`);
-
-  return {
-    props: {
-      rss,
-    },
-  };
-};
