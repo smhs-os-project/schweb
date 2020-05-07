@@ -19,7 +19,7 @@ export default function Home({ rss }: IProps) {
         <Columns>
           <Column>
             <Title>
-              We are hiring!
+              開發中～
             </Title>
           </Column>
           <Column>
